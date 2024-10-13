@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Function to handle API requests with retries
+api_request() {
+  local url=$1
+  local retries=3
+  local delay=2
+  local attempt=0
+
+  while [ $attempt -lt $retries ]; do
+    response=$(curl -s --fail "$url")
+    if [ $? -eq 0 ]; then
+      echo "$response"
+      return 0
+    else
+      attempt=$((attempt + 1))
+      echo "Failed to contact API, retrying in $delay seconds... (Attempt $attempt of $retries)"
+      sleep $delay
+    fi
+  done
+
+  echo "Error: Unable to reach the API after $retries attempts." >&2
+  exit 1
+}
+
+main() {
+  clear
+  echo -e "Welcome to mac.run!"
+  echo -e "License Checker Script"
+sleep 5
+  # Get license key from user input
+  read -s -p "Enter your license key: " license_key
+
+  # Call the API to check license key validity
+  license_info=$(api_request "https://raw.githubusercontent.com/vahEzra/license/refs/heads/main/1")
+  license_resp=$(echo $license_info | ./jq -r ".success")
+
+  if [ "$license_resp" == "true" ]; then
+    echo -e "License key verified successfully."
+    # Perform actions based on valid license (e.g., provide access to features)
+  else
+    echo -e "Invalid license key. Please enter a valid key."
+    exit 1
+  fi
+}
+
+main
