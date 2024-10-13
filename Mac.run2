@@ -14,10 +14,10 @@ main() {
   clear
   echo -e "Welcome to mac.run!"
   echo -e "License Checker Script"
-sleep 5
 
   # Get license key from user input
-  read -s -p "Enter your license key: " license_key
+  echo -n "Enter your license key: "
+  read license_key
 
   # Validate the license key locally
   license_valid=$(validate_license "$license_key")
